@@ -1,0 +1,103 @@
+#!/bin/bash
+#Program written for EOPSY course at WUT to modify a file name
+#Author: Jakub Szumski
+
+PROGNAME="$(basename "$0")"
+
+recursion=0
+upper=0
+lower=0
+sed_flag=0
+sed_pattern=none
+
+
+#validation part
+
+validate_flags() {
+	
+(( $upper == 1 && $lower == 1)) && echo "Lower and upper chosen!!!" && usage >&2 && exit 1
+
+(( $upper == 1 || $lower == 1 && $sed_flag == 1)) && echo "Lower/Upper chosen with sed" && usage >&2 && exit 1
+
+}
+
+#usage information
+
+usage () {
+cat <<- _EOF_
+
+$PROGNAME is a scirpt that modifies the filename with either lowercasting or uppercasting it with optionall calling the sed pattern
+
+usage:
+
+	$PROGNAME [-r] [-l|-u] <dir/filenames....
+	$PROGNAME [-r] <sed pattern> <dir/filenames...>
+	$PROGNAME [-h] 
+
+options:
+
+	-l 		lowercase
+	-u 		uppercase 
+	-h 		show usage
+	<sed pattern>	pattern to which we should modify filenames
+
+	!!!!lowercase and uppercase cannot be used at once!!!
+
+$PROGNAME correct examples:
+
+	$PROGNAME -u some_file handbook.txt
+	$PROGNAME -l my_directory
+	$PROGNAME -r -u my_handbook
+	$PROGNAME 's/A/c' wordlist.py phonebook.txt
+
+$PROGNAME incorrect examples:
+	
+	$PROGNAME -a
+	$PROGNAME -u -l file
+	$PROGNAME -r <sed pattern>
+
+
+
+_EOF_
+return
+
+}
+
+
+#Main part of the script
+
+while [ -n "$1" ]; do
+  case "$1" in
+	-r)	recursion=1	
+		;;
+	-l) 	lower=1
+		;;
+	-h)	usage
+		exit 0
+		;;
+	-u) 	upper=1
+		;;
+	-*) 	echo "Option unavaliable"
+		usage >&2
+	       	exit 1
+		;;
+	*)	if (( $sed_flag == 0)); then
+		  sed_flag=1
+		  sed_pattern=$1
+		else	
+		  break
+		fi
+		;;
+  esac
+  shift
+done
+
+echo $recursion
+echo $lower
+echo $upper
+echo $sed_flag
+echo $sed_pattern
+
+#validate sed pattern before flags!!
+
+validate_flags
