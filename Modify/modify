@@ -17,9 +17,33 @@ validate_flags() {
 	
 (( $upper == 1 && $lower == 1)) && echo "Lower and upper chosen!!!" && usage >&2 && exit 1
 
-(( $upper == 1 || $lower == 1 && $sed_flag == 1)) && echo "Lower/Upper chosen with sed" && usage >&2 && exit 1
+(( $upper == 1 || $lower == 1))  && [[ $sed_pattern -ne "none" ]] && echo "Lower/Upper chosen with sed" && usage >&2 && exit 1
 
 }
+
+#recursive function
+recursive() {
+
+for el in "$1"/*
+do
+
+	dir_name="basename '$el'"
+
+	[[ $dirname == "*" ]] && break
+
+	[[ "$sed_pattern" != "none" ]] &&  newname=$(echo "$el" | sed "$sed_pattern")
+	(( $upper == 1 )) && newname="${el^^}"
+	(( $lower == 1 )) && newname="${el,,}"
+	
+	
+	[[ "$el" != "$newname" ]]  && mv "$el" "$newname"
+
+	[[ -d "$newname" ]] && recursive $newname
+
+
+done
+}
+
 
 #usage information
 
@@ -63,19 +87,19 @@ return
 
 }
 
-
 #Main part of the script
+
+[[ -z "$1" || "$1" == "-h" ]] && usage && exit 0 
 
 while [ -n "$1" ]; do
   case "$1" in
 	-r)	recursion=1	
 		;;
 	-l) 	lower=1
-		;;
-	-h)	usage
-		exit 0
+		sed_flag=1
 		;;
 	-u) 	upper=1
+		sed_flag=1
 		;;
 	-*) 	echo "Option unavaliable"
 		usage >&2
@@ -92,12 +116,28 @@ while [ -n "$1" ]; do
   shift
 done
 
-echo $recursion
-echo $lower
-echo $upper
-echo $sed_flag
-echo $sed_pattern
-
-#validate sed pattern before flags!!
 
 validate_flags
+
+#validate_sed
+
+[[ -z "$1" ]] && echo "No file/path was given" && exit 1
+
+#execution of program
+
+for el in "$@"; do
+
+
+	[[ "$sed_pattern" != "none" ]] &&  newname=$(echo "$el" | sed "$sed_pattern")
+
+	(( $upper == 1 )) && newname="${el^^}"
+
+	(( $lower == 1 )) && newname="${el,,}"
+
+	#echo "renaming '$el' into '$newname'"
+	[[ "$el" != "$newname" ]]  && mv "$el" "$newname"
+
+	[[ $recursion == 1 && -d $newname ]] && recursive $newname
+
+done
+
