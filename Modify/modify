@@ -22,10 +22,6 @@ validate_flags() {
 	  exit 1
 	fi
 
-}
-
-validate_sed () {
-
 	if test $upper -eq 0 -a $lower -eq 0 -a  $sed_pattern = "none";
 	then
 	  echo "Sed pattern cannot be none!!"
@@ -33,7 +29,7 @@ validate_sed () {
 	  exit 1
 	fi
 
-	#if sed response is not valid then fail
+
 
 }
 
@@ -161,8 +157,6 @@ done
 
 validate_flags
 
-validate_sed
-
 if [ -z "$1" ];
 then
   echo "No file/path was given"
@@ -182,6 +176,11 @@ for el in "$@"; do
 	if test "$sed_pattern" != "none";
 	then
 	  newname=$(echo "$el" | sed "$sed_pattern")
+	  if test $? -ne 0
+	  then 
+		echo "Invalid sed pattern!!!"
+		exit 1
+	  fi
 	fi
 
 	if test $upper -eq 1;
