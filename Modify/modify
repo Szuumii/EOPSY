@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #Program written for EOPSY course at WUT to modify a file name
 #Author: Jakub Szumski
 
@@ -15,33 +15,70 @@ sed_pattern=none
 
 validate_flags() {
 	
-(( $upper == 1 && $lower == 1)) && echo "Lower and upper chosen!!!" && usage >&2 && exit 1
+	if test  $upper -eq 1 -a $lower -eq 1;
+	then
+	  echo "Lower and upper chosen!!!"
+	  usage >&2
+	  exit 1
+	fi
 
-(( $upper == 1 || $lower == 1))  && [[ $sed_pattern -ne "none" ]] && echo "Lower/Upper chosen with sed" && usage >&2 && exit 1
+}
+
+validate_sed () {
+
+	if test $upper -eq 0 -a $lower -eq 0 -a  $sed_pattern = "none";
+	then
+	  echo "Sed pattern cannot be none!!"
+	  usage >&2
+	  exit 1
+	fi
+
+	#if sed response is not valid then fail
 
 }
 
 #recursive function
 recursive() {
 
-for el in "$1"/*
-do
-
-	dir_name="basename '$el'"
-
-	[[ $dirname == "*" ]] && break
-
-	[[ "$sed_pattern" != "none" ]] &&  newname=$(echo "$el" | sed "$sed_pattern")
-	(( $upper == 1 )) && newname="${el^^}"
-	(( $lower == 1 )) && newname="${el,,}"
+cd $1
+for el in *;
+do	
+	#dir_name="$(basename $el)"
 	
-	
-	[[ "$el" != "$newname" ]]  && mv "$el" "$newname"
+	if test "$sed_pattern" != "none";
+	then
+	  newname=$(echo "$el" | sed "$sed_pattern")
+	fi
 
-	[[ -d "$newname" ]] && recursive $newname
+	if test  $upper -eq 1;
+	then
+	  newname="$(echo "$el" | tr a-z A-Z)"
+	fi
+
+	if test  $lower -eq 1;
+	then
+	  newname="$(echo "$el" | tr A-Z a-z)"
+	fi
+	
+	if test "$el" != "$newname";
+	then
+	  mv "$el" "$newname"
+	fi
+	
+	if test -z "$(ls -A "$newname")";
+	then
+	  continue
+	fi
+
+	if test -d "$newname";
+	then
+	  recursive $newname
+	fi
 
 
 done
+
+cd ..
 }
 
 
@@ -72,7 +109,7 @@ $PROGNAME correct examples:
 	$PROGNAME -u some_file handbook.txt
 	$PROGNAME -l my_directory
 	$PROGNAME -r -u my_handbook
-	$PROGNAME 's/A/c' wordlist.py phonebook.txt
+	$PROGNAME 's/A/c/' wordlist.py phonebook.txt
 
 $PROGNAME incorrect examples:
 	
@@ -89,7 +126,11 @@ return
 
 #Main part of the script
 
-[[ -z "$1" || "$1" == "-h" ]] && usage && exit 0 
+if test -z "$1" -o "$1" = "-h";
+then
+  usage 
+  exit 0
+fi
 
 while [ -n "$1" ]; do
   case "$1" in
@@ -105,7 +146,8 @@ while [ -n "$1" ]; do
 		usage >&2
 	       	exit 1
 		;;
-	*)	if (( $sed_flag == 0)); then
+	*)	if test $sed_flag -eq 0; 
+		then
 		  sed_flag=1
 		  sed_pattern=$1
 		else	
@@ -119,25 +161,48 @@ done
 
 validate_flags
 
-#validate_sed
+validate_sed
 
-[[ -z "$1" ]] && echo "No file/path was given" && exit 1
+if [ -z "$1" ];
+then
+  echo "No file/path was given"
+  exit 1
+fi
 
 #execution of program
 
 for el in "$@"; do
 
+	if test ! -e $el;
+	then
+	  echo "Incorrect file name"
+	  continue
+	fi
 
-	[[ "$sed_pattern" != "none" ]] &&  newname=$(echo "$el" | sed "$sed_pattern")
+	if test "$sed_pattern" != "none";
+	then
+	  newname=$(echo "$el" | sed "$sed_pattern")
+	fi
 
-	(( $upper == 1 )) && newname="${el^^}"
+	if test $upper -eq 1;
+	then
+	  newname="$(echo "$el" | tr a-z A-Z)"
+	fi
 
-	(( $lower == 1 )) && newname="${el,,}"
+	if test $lower -eq 1;
+	then
+	  newname="$(echo "$el" | tr A-Z a-z)"
+	fi
 
-	#echo "renaming '$el' into '$newname'"
-	[[ "$el" != "$newname" ]]  && mv "$el" "$newname"
+	if test  "$el" != "$newname";
+	then
+	  mv "$el" "$newname"
+	fi
 
-	[[ $recursion == 1 && -d $newname ]] && recursive $newname
+	if test $recursion -eq 1 -a -d $newname;
+	then
+	  recursive $newname
+	fi
 
 done
 
