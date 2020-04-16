@@ -16,6 +16,7 @@ mkdir directory/hidden_dir
 mkdir zoo/lion
 touch zoo/lion/zebra
 mkdir zoo/tiger
+mkdir zoo/'Two Lamas'
 mkdir folder/pictures
 mkdir folder/pictures/holiday
 touch folder/pictures/holiday/tenerife.jpg
@@ -24,12 +25,13 @@ touch folder/documents/important
 
 ls -R
 
-
-echo "**************************************** Correct usage examples ************************************"
+echo "================================== Presenting usage ================================================"
 
 echo "Running command: ../modify -h"
 ../modify -h
 
+
+echo "**************************************** Correct usage examples ************************************"
 
 echo "\n========================================== Running test 1 ============================================="
 echo "\nRunning command: ../modify -u zoo directory"
@@ -95,12 +97,17 @@ echo "\nRunning command: ../modify -l -u"
 
 
 echo "\n========================================== Running test 3 ============================================="
-echo "\nRunning command: ../modify -r 's/[A-Z]/f'"
-../modify -r 's/[A-Z]/f'
+echo "\nRunning command: ../modify -r 's/[A-Z]/f' directory"
+../modify -r 's/[A-Z]/f' directory
 
 echo "\n========================================== Running test 4 ============================================="
 echo "\nRunning command: ../modify -r -l somefile"
 ../modify -r -l somefile
+
+
+echo "\n========================================== Running test 5 ============================================="
+echo "\nRunning command: ../modify -u"
+../modify -u
 
 
 echo "================================== End of test script of modify command =================================="
