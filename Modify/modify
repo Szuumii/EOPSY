@@ -24,7 +24,7 @@ validate_flags() {
 
 	if test $upper -eq 0 -a $lower -eq 0 -a  $sed_pattern = "none";
 	then
-	  echo "Sed pattern cannot be none!!"
+	  echo "Too few arguments!!"
 	  usage >&2
 	  exit 1
 	fi
