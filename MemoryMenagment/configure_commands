@@ -1,0 +1,11 @@
+#!/bin/bash
+
+page_size=16384
+i=0
+
+echo "READ $i" > commands
+
+for i in {1..63}
+do
+	echo "READ $((  i * page_size  ))" >> commands
+done
