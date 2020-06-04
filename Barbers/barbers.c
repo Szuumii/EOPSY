@@ -13,7 +13,7 @@
 #define MALE_BARBERS 3
 #define FEMALE_BARBERS 2
 #define UNISEX_BARBERS 4
-#define CLIENTS 15
+#define CLIENTS 20
 
 //genders
 #define FEMALE 0
@@ -67,8 +67,9 @@ struct semaphores
 };
 
 
+
 //access semaphores
-void get_semaphores(struct semaphores* sem);
+void semaphores_get(struct semaphores* sem);
 
 int main(int argc, char** argv) 
 {
@@ -105,12 +106,12 @@ int main(int argc, char** argv)
 		perror("Error getting semaphores");
 	}
 
+
 	union semun
 	{
 		int val;
 		unsigned int* array;
 	} sem_un;
-	
 
 	//setting initial value for waiting room mutex
 	sem_un.val = 1;
@@ -290,8 +291,11 @@ void barber(int gender, int id)
 void customer(int gender, int id)
 {
 	struct shared_memory* shm = get_memory();
+	struct semaphores sem;
+	semaphores_get(&sem);
 	printf("%s client: [%d] entered waiting room\n", sex[gender] , id);
 	lock_wr();
+	int barber_gender;
 	if((shm->waiting_female_clients + shm->waiting_male_clients) < QUEUE)
 	{
 		switch (gender)
@@ -300,14 +304,26 @@ void customer(int gender, int id)
 			shm->waiting_female_clients++;
 			unlock_customer(gender);
 			unlock_wr();
-			lock_barber(gender);
+
+			if(semctl(sem.barbers, UNISEX, GETVAL) >= semctl(sem.barbers, FEMALE, GETVAL))
+				barber_gender = UNISEX;
+			else
+				barber_gender = FEMALE;
+			
+			lock_barber(barber_gender);
 			printf("%s client: [%d] ready to be served\n",sex[gender],id);
 			break;
 		case MALE:
 			shm->waiting_male_clients++;
 			unlock_customer(gender);
 			unlock_wr();
-			lock_barber(gender);
+
+			if(semctl(sem.barbers, UNISEX, GETVAL) >= semctl(sem.barbers, MALE, GETVAL))
+				barber_gender = UNISEX;
+			else
+				barber_gender = MALE;
+
+			lock_barber(barber_gender);
 			printf("%s client: [%d] ready to be served\n",sex[gender],id);
 			break;
 		}

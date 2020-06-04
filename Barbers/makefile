@@ -14,4 +14,4 @@ run:
 	./barbers
 
 clean:
-	rm barbers.o
+	rm barbers.o barbers
