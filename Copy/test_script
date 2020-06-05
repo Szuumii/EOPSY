@@ -1,0 +1,57 @@
+
+echo "----------------------Testing small file-------------------------------"
+t_start=`date +%N`
+./copy 'test/small_file' 'test/file_copy_rw'
+t_end=`date +%N`
+runtime_rw=`expr $t_end '-' $t_start`
+t_start=`date +%N`
+./copy '-m' 'test/small_file' 'test/file_copy_mm'
+t_end=`date +%N`
+runtime_mm=`expr $t_end '-' $t_start`
+echo "Runtime:"
+echo "ReadWrite:" $runtime_rw "ns"
+echo "MM:" $runtime_mm "ns"
+echo "Hash sums:"
+sha1sum 'test/small_file'
+sha1sum 'test/file_copy_rw'
+sha1sum 'test/file_copy_mm'
+rm 'test/file_copy_rw' 'test/file_copy_mm'
+echo "--------------------------------------------------------------------------"
+
+echo "----------------------Testing med file-------------------------------"
+t_start=`date +%N`
+./copy 'test/med_file' 'test/file_copy_rw'
+t_end=`date +%N`
+runtime_rw=`expr $t_end '-' $t_start`
+t_start=`date +%N`
+./copy '-m' 'test/med_file' 'test/file_copy_mm'
+t_end=`date +%N`
+runtime_mm=`expr $t_end '-' $t_start`
+echo "Runtime:"
+echo "ReadWrite:" $runtime_rw "ns"
+echo "MM:" $runtime_mm "ns"
+echo "Hash sums:"
+sha1sum 'test/med_file'
+sha1sum 'test/file_copy_rw'
+sha1sum 'test/file_copy_mm'
+rm 'test/file_copy_rw' 'test/file_copy_mm'
+echo "--------------------------------------------------------------------------"
+
+echo "----------------------Testing med file-------------------------------"
+t_start=`date +%N`
+./copy 'test/big_file' 'test/file_copy_rw'
+t_end=`date +%N`
+runtime_rw=`expr $t_end '-' $t_start`
+t_start=`date +%N`
+./copy '-m' 'test/big_file' 'test/file_copy_mm'
+t_end=`date +%N`
+runtime_mm=`expr $t_end '-' $t_start`
+echo "Runtime:"
+echo "ReadWrite:" $runtime_rw "ns"
+echo "MM:" $runtime_mm "ns"
+echo "Hash sums:"
+sha1sum 'test/big_file'
+sha1sum 'test/file_copy_rw'
+sha1sum 'test/file_copy_mm'
+rm 'test/file_copy_rw' 'test/file_copy_mm'
+echo "--------------------------------------------------------------------------"
