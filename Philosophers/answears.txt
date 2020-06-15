@@ -1,6 +1,10 @@
-2. Why m mutex is initialized with 1 and mutexes from the array s are initialized with 0's?
+1. Would it be sufficient just to add to the old algorithm from task5 additional mutex variable to organize critical sections in functions grab_forks() and put_away_forks() for making changes to values of two mutexes indivisably?  
+If not, why? 
 
-Mutex m was initialized with 1 due to the fact that while entering a critical reagion we don't want any other thread to interfere with the data included in it. This chagne might happen only by the thread
+Answear is not given due to the fact that I've solved diffrent task, Barber problem.
+
+
+2. Why m mutex is initialized with 1 and mutexes from the array s are initialized with 0's? Mutex m was initialized with 1 due to the fact that while entering a critical reagion we don't want any other thread to interfere with the data included in it. This chagne might happen only by the thread
 that is currently in critical reagion only.
 Array s of mutexes is initialized with  in order to prohibit a philosopher thread after an attepmt to grab forks. In such a case philosopher may be unlocked by it's neighbour which signals them that they can move on
 to the eating phase using test method if the conditions are met.
