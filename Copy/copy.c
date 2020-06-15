@@ -75,6 +75,22 @@ int main(int argc, char** argv)
     }
 
     int result = mem_cpy ? copy_nmap(src_file,dest_file) : copy_read_write(src_file, dest_file);
+
+    int close_src = close(src_file);
+    if(close_src == -1)
+    {
+        perror("Error closing src file");
+        exit(1);
+    }
+
+
+    int close_dest = close(dest_file);
+    if(close_dest == -1)
+    {
+        perror("Error closing src file");
+        exit(1);
+    }
+
     return result;
 
 }
